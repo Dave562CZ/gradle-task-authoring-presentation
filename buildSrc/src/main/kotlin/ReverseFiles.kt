@@ -1,22 +1,28 @@
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.ProjectLayout
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.*
-import java.io.File
+import javax.inject.Inject
 
 @CacheableTask
-abstract class ReverseFiles: DefaultTask() {
+abstract class ReverseFiles @Inject constructor(
+        objects: ObjectFactory,
+        projectLayout: ProjectLayout
+): DefaultTask() {
 
     @InputDirectory
     @PathSensitive(PathSensitivity.RELATIVE)
-    var sourceDirectory: File = project.projectDir.resolve("src")
+    val sourceDirectory: DirectoryProperty = objects.directoryProperty().convention(projectLayout.projectDirectory.dir("src"))
 
     @OutputDirectory
-    var outputDirectory: File = project.buildDir.resolve("reversed")
+    val outputDirectory: DirectoryProperty = objects.directoryProperty().convention(projectLayout.buildDirectory.dir("reversed"))
 
     @TaskAction
     fun reverse() {
-        sourceDirectory.listFiles()!!.forEach {
+        sourceDirectory.get().asFile.listFiles()!!.forEach {
             Thread.sleep(100)
-            outputDirectory.resolve(it.name).writeText(it.readText().reversed())
+            outputDirectory.file(it.name).get().asFile.writeText(it.readText().reversed())
         }
     }
 }
