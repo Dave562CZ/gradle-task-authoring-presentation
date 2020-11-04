@@ -1,12 +1,12 @@
 import org.gradle.api.DefaultTask
-import org.gradle.api.tasks.InputDirectory
-import org.gradle.api.tasks.OutputDirectory
-import org.gradle.api.tasks.TaskAction
+import org.gradle.api.tasks.*
 import java.io.File
 
+@CacheableTask
 abstract class ReverseFiles: DefaultTask() {
 
     @InputDirectory
+    @PathSensitive(PathSensitivity.RELATIVE)
     var sourceDirectory: File = project.projectDir.resolve("src")
 
     @OutputDirectory
